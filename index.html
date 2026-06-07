@@ -371,6 +371,7 @@ function subscribePalpites(cb){
   tick(); const id=setInterval(tick,1500); return ()=>clearInterval(id);
 }
 const onlyDigits=s=>(s||'').replace(/\D/g,'');
+function siteURL(){ return location.protocol.indexOf('http')===0 ? location.origin+location.pathname.replace(/index\.html$/,'') : CONFIG.urlSite; }
 
 /* ================= ESTADO ================= */
 let usuario=null;            // {nome,sobrenome,tel,nasc}
@@ -455,9 +456,10 @@ async function finish(){
   go('ok');
 }
 function share(){
+  const url=siteURL();
   const txt=`Tô no Bolão do Aura de Copa! Cravei ${CONFIG.jogo.casa.nome} ${palpite.casa}×${palpite.fora} ${CONFIG.jogo.fora.nome}. Vem torcer 🇧🇷 ${CONFIG.hashtag}`;
-  if(navigator.share)navigator.share({title:"Aura de Copa",text:txt,url:CONFIG.urlSite}).catch(()=>{});
-  else window.open("https://wa.me/?text="+encodeURIComponent(txt+" "+CONFIG.urlSite),"_blank");
+  if(navigator.share)navigator.share({title:"Aura de Copa",text:txt,url}).catch(()=>{});
+  else window.open("https://wa.me/?text="+encodeURIComponent(txt+" "+url),"_blank");
 }
 function resetAll(){palpite={casa:0,fora:0,autores:[]};document.getElementById('sc-casa').textContent="0";document.getElementById('sc-fora').textContent="0";renderAutores();go('bolao');}
 
@@ -477,7 +479,7 @@ function telao(on){
     document.getElementById('tv-nm-fora').textContent=j.fora.nome;
     document.getElementById('tv-flag-casa').innerHTML=flagHTML(j.casa);
     document.getElementById('tv-flag-fora').innerHTML=flagHTML(j.fora);
-    if(!qrFeito){new QRCode(document.getElementById("qrcode"),{text:CONFIG.urlSite,width:128,height:128,colorDark:"#054d12",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.H});qrFeito=true;}
+    if(!qrFeito){new QRCode(document.getElementById("qrcode"),{text:siteURL(),width:128,height:128,colorDark:"#054d12",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.H});qrFeito=true;}
     tickTelao();
     clearInterval(tvTimer); tvTimer=setInterval(tickTelao,1000);
     if(unsub)unsub(); unsub=subscribePalpites(list=>{palpitesAtuais=list;renderLista();});
