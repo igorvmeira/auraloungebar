@@ -134,6 +134,7 @@ body{font-family:'Rajdhani',sans-serif;color:var(--tinta);min-height:100dvh;over
 .tv-foot{grid-column:1/3;background:var(--verde-esc);border:2px solid rgba(255,255,255,.16);box-shadow:0 8px 22px rgba(0,0,0,.45);border-radius:12px;padding:13px 18px;display:flex;align-items:center;gap:14px;position:relative;z-index:3;}
 .tv-foot .tag{flex:0 0 auto;background:var(--amarelo);color:var(--tinta);font-family:'Poppins';font-weight:900;text-transform:uppercase;font-size:clamp(.7rem,1.3vw,1rem);padding:5px 12px;border-radius:20px;letter-spacing:.04em;}
 .tv-foot .cur{font-family:'Rajdhani';font-weight:700;color:#fff;font-size:clamp(.95rem,1.7vw,1.35rem);transition:opacity .5s;text-shadow:0 1px 2px rgba(0,0,0,.3);}
+.tv-foot .cur b{color:var(--amarelo);}
 .tv-exit{position:absolute;top:8px;left:10px;z-index:5;font-size:.65rem;color:rgba(255,255,255,.35);text-decoration:none;font-family:'Poppins';font-weight:700;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;}
 
 @media (max-width:780px){
@@ -152,6 +153,8 @@ body{font-family:'Rajdhani',sans-serif;color:var(--tinta);min-height:100dvh;over
 .jogo-card.off .jc-tag{background:#b8a878;}
 .autores select{flex:1;font-family:'Rajdhani';font-weight:700;font-size:1.02rem;background:#fff;border:2px solid #c9c1a6;border-radius:4px;padding:9px 11px;outline:none;color:var(--tinta);}
 .autores select:focus{border-color:var(--verde);}
+.ig-cta{margin-top:12px;background:#e4f6e6;border:2px dashed var(--verde);border-radius:12px;padding:12px 14px;text-align:center;font-family:'Rajdhani';font-weight:600;color:var(--verde-esc);font-size:1rem;line-height:1.25;}
+.ig-cta b{font-family:'Poppins';font-weight:800;}
 </style>
 </head>
 <body>
@@ -259,6 +262,7 @@ body{font-family:'Rajdhani',sans-serif;color:var(--tinta);min-height:100dvh;over
           <div class="num" id="cf-num">000000</div>
         </div>
         <p class="sub center">Seu palpite já está no <b style="color:var(--verde-esc)">telão</b>. Fique de olho — o ganhador sai por lá! Mostre esta tela pro garçom pra retirar o prêmio.</p>
+        <div class="ig-cta">📸 Tá no Aura? Poste e marque <b>@aurabar.lounge</b> com <b>#AuraDeCopa</b> e concorra a um <b>prêmio extra</b>!</div>
       </div>
       <button class="btn amarelo" onclick="share()"><span class="flash"></span>Chamar a galera</button>
       <button class="btn ghost" onclick="go('choice')">Voltar ao início</button>
@@ -305,7 +309,7 @@ body{font-family:'Rajdhani',sans-serif;color:var(--tinta);min-height:100dvh;over
     </div>
 
     <div class="tv-foot">
-      <span class="tag">Você sabia?</span>
+      <span class="tag" id="tv-tag">Você sabia?</span>
       <div class="cur" id="tv-curiosidade">—</div>
     </div>
   </div>
@@ -355,6 +359,7 @@ const CONFIG = {
     "O tatu-bola Fuleco foi o mascote da Copa de 2014 no Brasil.",
     "Ronaldo Fenômeno é o maior artilheiro brasileiro em Copas, com 15 gols."
   ],
+  social:{ instagram:"@aurabar.lounge", hashtag:"#AuraDeCopa" },
   // ===== FIREBASE: cole a config do seu projeto (Console Firebase > Project settings > Web app) =====
   firebase:{
     apiKey:"AIzaSyCfhJ0jj3sgUOvKqSMYAnRCZFU8M633k0E",
@@ -559,10 +564,19 @@ function renderLista(){
   if(!ps.length){list.innerHTML=`<div class="empty"><div class="big">Seja o primeiro!</div><div>Aponte a câmera no QR e dê seu palpite 📲</div></div>`;return;}
   list.innerHTML=ps.map(p=>`<div class="prow"><span class="pn">${p.nome}</span><span class="pp">${p.casa} <span class="x">×</span> ${p.fora}</span></div>`).join('');
 }
+let FEED=[];
+function buildFeed(){
+  FEED=[];
+  CONFIG.curiosidades.forEach((c,i)=>{
+    FEED.push({tag:'Você sabia?', html:c});
+    if(i%2===1) FEED.push({tag:'📸 Marque a gente', html:`Tá no Aura? Poste e marque <b>${CONFIG.social.instagram}</b> · <b>${CONFIG.social.hashtag}</b> e concorra a um <b>prêmio extra</b>!`});
+  });
+}
 function rotaCuriosidade(){
-  const el=document.getElementById('tv-curiosidade');
+  if(!FEED.length) buildFeed();
+  const el=document.getElementById('tv-curiosidade'), tg=document.getElementById('tv-tag');
   el.style.opacity=0;
-  setTimeout(()=>{el.textContent=CONFIG.curiosidades[curIdx%CONFIG.curiosidades.length];curIdx++;el.style.opacity=1;},300);
+  setTimeout(()=>{ const it=FEED[curIdx%FEED.length]; tg.textContent=it.tag; el.innerHTML=it.html; curIdx++; el.style.opacity=1; },300);
 }
 
 /* ================= INIT ================= */
