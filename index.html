@@ -90,7 +90,8 @@ body{font-family:'Rajdhani',sans-serif;color:var(--tinta);min-height:100dvh;over
 /* ============ TELÃO (TV landscape) ============ */
 #telao{display:none;}
 #telao.on{display:block;min-height:100dvh;background:var(--verde-mais);color:#fff;position:relative;overflow:hidden;}
-.tv-collage-t,.tv-collage-b{position:absolute;left:0;width:100%;opacity:.9;z-index:0;}
+.tv-collage-t,.tv-collage-b{position:absolute;left:0;width:100%;opacity:.4;z-index:0;}
+#telao.on::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(5,45,17,.55),rgba(5,45,17,.8));pointer-events:none;}
 .tv-collage-t{top:0;} .tv-collage-b{bottom:0;transform:scaleY(-1);}
 .tv-grid{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr auto;gap:18px;
   height:100dvh;padding:22px 26px;}
@@ -105,7 +106,7 @@ body{font-family:'Rajdhani',sans-serif;color:var(--tinta);min-height:100dvh;over
 
 /* coluna esquerda: confronto + contador */
 .tv-left{display:flex;flex-direction:column;gap:16px;min-height:0;}
-.confronto{background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.18);border-radius:16px;padding:18px;display:flex;align-items:center;justify-content:space-around;gap:14px;}
+.confronto{background:rgba(4,40,15,.8);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);border:2px solid rgba(255,255,255,.18);border-radius:16px;padding:18px;display:flex;align-items:center;justify-content:space-around;gap:14px;box-shadow:0 8px 22px rgba(0,0,0,.35);}
 .confronto .t{text-align:center;}
 .confronto .fl{width:clamp(64px,8vw,110px);height:clamp(44px,5.4vw,74px);margin:0 auto 8px;border-radius:7px;overflow:hidden;display:flex;flex-direction:column;border:3px solid #fff;box-shadow:0 6px 14px rgba(0,0,0,.35);}
 .confronto .tn{font-family:'Poppins';font-weight:900;text-transform:uppercase;font-size:clamp(1.1rem,2.4vw,2rem);}
@@ -114,7 +115,7 @@ body{font-family:'Rajdhani',sans-serif;color:var(--tinta);min-height:100dvh;over
 .countdown .cl{font-family:'Poppins';font-weight:800;text-transform:uppercase;letter-spacing:.14em;font-size:clamp(.8rem,1.5vw,1.1rem);}
 .countdown .cd{font-family:'Poppins';font-weight:900;font-size:clamp(2.4rem,6vw,5rem);line-height:1;letter-spacing:.02em;}
 .countdown .cu{font-family:'Poppins';font-weight:700;font-size:clamp(.6rem,1.1vw,.8rem);letter-spacing:.3em;text-transform:uppercase;opacity:.7;margin-top:2px;}
-.regra{background:rgba(0,0,0,.18);border-radius:14px;padding:14px 16px;font-family:'Rajdhani';font-weight:600;font-size:clamp(.85rem,1.5vw,1.15rem);line-height:1.3;}
+.regra{background:rgba(4,40,15,.82);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:14px 16px;font-family:'Rajdhani';font-weight:600;font-size:clamp(.85rem,1.5vw,1.15rem);line-height:1.35;box-shadow:0 8px 22px rgba(0,0,0,.35);}
 .regra b{color:var(--amarelo);font-family:'Poppins';font-weight:800;}
 
 /* coluna direita: lista do bolão */
