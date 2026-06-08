@@ -9,14 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
 :root{--verde:#008e0f;--verde-esc:#006a0b;--verde-mais:#054d12;--amarelo:#e0a800;--papel:#f4efe2;--tinta:#1b2a1b;--linha:#ddd3b8;}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Rajdhani',sans-serif;background:var(--papel);color:var(--tinta);min-height:100dvh;}
 .wrap{max-width:1080px;margin:0 auto;padding:18px 16px 60px;}
-
-/* TOPO */
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:3px solid var(--verde);padding-bottom:12px;margin-bottom:18px;}
 .brand{font-family:'Poppins';font-weight:900;color:var(--verde-esc);font-size:1.5rem;letter-spacing:-.02em;}
 .brand small{display:block;font-family:'Rajdhani';font-weight:700;letter-spacing:.28em;color:var(--amarelo);font-size:.7rem;text-transform:uppercase;}
@@ -25,19 +24,13 @@ body{font-family:'Rajdhani',sans-serif;background:var(--papel);color:var(--tinta
 .btn.ghost{background:transparent;color:var(--verde-esc);border:2px solid var(--verde);}
 .btn.sm{padding:7px 12px;font-size:.78rem;}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
-
-/* CARDS DE NÚMERO */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px;}
 .stat{background:#fff;border:1px solid var(--linha);border-radius:14px;padding:14px 16px;box-shadow:0 6px 16px rgba(0,0,0,.05);}
 .stat .n{font-family:'Poppins';font-weight:900;font-size:2rem;color:var(--verde-esc);line-height:1;}
 .stat .l{font-family:'Rajdhani';font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:.78rem;color:#6b6347;margin-top:2px;}
-
-/* ABAS */
 .tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
 .tab{cursor:pointer;font-family:'Poppins';font-weight:800;font-size:.9rem;padding:9px 16px;border-radius:30px;background:#e7dec5;color:#6b6347;border:none;}
 .tab.on{background:var(--verde);color:#fff;}
-
-/* CONTROLES */
 .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
 .controls input,.controls select{font-family:'Rajdhani';font-weight:600;font-size:1rem;padding:10px 12px;border:2px solid var(--linha);border-radius:8px;background:#fff;outline:none;}
 .controls input{flex:1;min-width:180px;}
@@ -46,8 +39,6 @@ body{font-family:'Rajdhani',sans-serif;background:var(--papel);color:var(--tinta
 .dot{width:9px;height:9px;border-radius:50%;background:#bbb;}
 .dot.on{background:#28c049;box-shadow:0 0 0 4px rgba(40,192,73,.2);animation:pulse 1.6s infinite;}
 @keyframes pulse{50%{box-shadow:0 0 0 7px rgba(40,192,73,0);}}
-
-/* TABELA */
 .tablewrap{background:#fff;border:1px solid var(--linha);border-radius:14px;overflow:hidden;box-shadow:0 6px 16px rgba(0,0,0,.05);}
 table{width:100%;border-collapse:collapse;}
 th,td{padding:11px 12px;text-align:left;font-size:.95rem;}
@@ -63,13 +54,12 @@ td.mono{font-variant-numeric:tabular-nums;}
 .num{font-family:'Poppins';font-weight:800;color:#b07c00;}
 .empty{padding:40px;text-align:center;color:#8a8267;font-weight:600;}
 .section{display:none;} .section.on{display:block;}
-
-/* GATE (login) */
 #gate{position:fixed;inset:0;background:var(--verde-mais);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50;}
-.gatebox{background:var(--papel);border-radius:18px;padding:30px 26px;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.4);}
+.gatebox{background:var(--papel);border-radius:18px;padding:30px 26px;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.4);}
 .gatebox .b{font-family:'Poppins';font-weight:900;color:var(--verde-esc);font-size:1.7rem;}
 .gatebox small{display:block;font-family:'Rajdhani';font-weight:700;letter-spacing:.28em;color:var(--amarelo);text-transform:uppercase;font-size:.7rem;margin-bottom:18px;}
-.gatebox input{width:100%;font-family:'Poppins';font-weight:700;font-size:1.3rem;text-align:center;letter-spacing:.3em;padding:13px;border:2px solid var(--linha);border-radius:10px;outline:none;margin-bottom:12px;}
+.gatebox label{display:block;text-align:left;font-family:'Poppins';font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--verde-esc);margin:0 0 4px 2px;}
+.gatebox input{width:100%;font-family:'Rajdhani';font-weight:700;font-size:1.1rem;padding:12px;border:2px solid var(--linha);border-radius:10px;outline:none;margin-bottom:12px;}
 .gatebox input:focus{border-color:var(--verde);}
 .gatebox .err{color:#c0392b;font-weight:700;font-size:.85rem;min-height:18px;margin-top:6px;}
 .note{font-size:.78rem;color:#6b6347;margin-top:18px;line-height:1.4;}
@@ -82,10 +72,13 @@ td.mono{font-variant-numeric:tabular-nums;}
 <div id="gate">
   <div class="gatebox">
     <div class="b">Aura de Copa</div><small>Painel do Admin</small>
-    <input id="pin" type="password" inputmode="numeric" placeholder="• • • •" autocomplete="off">
+    <label>E-mail</label>
+    <input id="email" type="email" autocomplete="username" placeholder="voce@email.com">
+    <label>Senha</label>
+    <input id="senha" type="password" autocomplete="current-password" placeholder="••••••••">
     <button class="btn" style="width:100%;font-size:1rem;padding:13px;" onclick="entrar()">Entrar</button>
     <div class="err" id="gate-err"></div>
-    <div class="note">Acesso restrito. Use o PIN definido no arquivo.</div>
+    <div class="note">Acesso restrito. Use o e-mail e a senha cadastrados no Firebase.</div>
   </div>
 </div>
 
@@ -144,8 +137,6 @@ td.mono{font-variant-numeric:tabular-nums;}
 
 <script>
 /* ===================== CONFIG ===================== */
-const ADMIN_PIN = "2026";   // <<< TROQUE pelo seu PIN secreto
-
 const firebaseConfig = {
   apiKey:"AIzaSyCfhJ0jj3sgUOvKqSMYAnRCZFU8M633k0E",
   authDomain:"auraloungebar-ebe24.firebaseapp.com",
@@ -161,28 +152,49 @@ const JOGOS = [
 ];
 
 /* ===================== ESTADO ===================== */
-let FDB=null, leadsCache=[], palpitesCache=[], jogoAtual=JOGOS[0].id, unsubL=null, unsubP=null;
+let FDB=null, AUTH=null, leadsCache=[], palpitesCache=[], jogoAtual=JOGOS[0].id, unsubL=null, unsubP=null;
 
-/* ===================== LOGIN ===================== */
+/* ===================== INIT + AUTH ===================== */
+if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+AUTH=firebase.auth(); FDB=firebase.firestore();
+
+AUTH.onAuthStateChanged(user=>{
+  if(user){
+    document.getElementById('gate').style.display='none';
+    document.getElementById('painel').style.display='block';
+    iniciarPainel();
+  }else{
+    document.getElementById('painel').style.display='none';
+    document.getElementById('gate').style.display='flex';
+    if(unsubL){unsubL();unsubL=null;} if(unsubP){unsubP();unsubP=null;}
+    setTimeout(()=>{const e=document.getElementById('email'); if(e) e.focus();},150);
+  }
+});
+
 function entrar(){
-  const v=document.getElementById('pin').value.trim();
-  if(v===ADMIN_PIN){ document.getElementById('gate').style.display='none'; document.getElementById('painel').style.display='block'; iniciar(); }
-  else { document.getElementById('gate-err').textContent='PIN incorreto.'; }
+  const email=document.getElementById('email').value.trim();
+  const senha=document.getElementById('senha').value;
+  document.getElementById('gate-err').textContent='';
+  AUTH.signInWithEmailAndPassword(email,senha).catch(err=>{
+    const map={
+      'auth/invalid-email':'E-mail inválido.',
+      'auth/invalid-credential':'E-mail ou senha incorretos.',
+      'auth/wrong-password':'Senha incorreta.',
+      'auth/user-not-found':'Usuário não encontrado.',
+      'auth/too-many-requests':'Muitas tentativas. Aguarde um pouco.'
+    };
+    document.getElementById('gate-err').textContent=map[err.code]||('Erro: '+err.code);
+  });
 }
-document.getElementById('pin').addEventListener('keydown',e=>{ if(e.key==='Enter') entrar(); });
-function sair(){ location.reload(); }
+document.getElementById('senha').addEventListener('keydown',e=>{ if(e.key==='Enter') entrar(); });
+function sair(){ AUTH.signOut(); }
 
-/* ===================== FIREBASE ===================== */
-function iniciar(){
-  try{
-    if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    FDB=firebase.firestore();
-    setLive(true,'ao vivo');
-    // jogos no seletor
-    document.getElementById('sel-jogo').innerHTML=JOGOS.map(j=>`<option value="${j.id}">${j.label}</option>`).join('');
-    assinarLeads();
-    assinarPalpites();
-  }catch(e){ console.error(e); setLive(false,'erro de conexão'); }
+/* ===================== PAINEL ===================== */
+function iniciarPainel(){
+  setLive(true,'ao vivo');
+  document.getElementById('sel-jogo').innerHTML=JOGOS.map(j=>`<option value="${j.id}">${j.label}</option>`).join('');
+  assinarLeads();
+  assinarPalpites();
 }
 function setLive(on,txt){ document.getElementById('livedot').classList.toggle('on',on); document.getElementById('livetxt').textContent=txt; }
 
@@ -258,8 +270,6 @@ function exportPalpites(){
   const rows=palpitesCache.map(p=>[p.nome,fmtTel(p.tel),p.casa,p.fora,(p.autores||[]).join(' / '),p.numero,fmtData(p.ts)]);
   baixarCSV('aura-palpites-'+jogoAtual+'.csv',[[lbl],h,...rows]);
 }
-
-setTimeout(()=>document.getElementById('pin').focus(),200);
 </script>
 </body>
 </html>
