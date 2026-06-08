@@ -141,6 +141,16 @@ body{font-family:'Rajdhani',sans-serif;color:var(--tinta);min-height:100dvh;over
   .tv-foot{grid-column:1;}
   .tv-right{min-height:40vh;}
 }
+.jogo-card{display:flex;align-items:center;gap:10px;width:100%;background:#fff;border:2px solid var(--verde);border-radius:12px;padding:11px 12px;margin-top:10px;cursor:pointer;text-align:left;font-family:inherit;}
+.jogo-card:active{transform:translateY(2px);}
+.jogo-card.off{opacity:.55;border-style:dashed;border-color:#b8a878;cursor:default;}
+.jogo-card .mini{width:38px;height:26px;border-radius:4px;overflow:hidden;display:flex;flex-direction:column;border:1px solid #fff;flex:0 0 auto;box-shadow:0 2px 5px rgba(0,0,0,.2);}
+.jogo-card .jc-nome{font-family:'Poppins';font-weight:800;color:var(--verde-esc);font-size:1rem;line-height:1.1;}
+.jogo-card .jc-quando{font-family:'Rajdhani';font-weight:700;color:#6b6347;font-size:.82rem;}
+.jogo-card .jc-tag{margin-left:auto;font-family:'Poppins';font-weight:800;font-size:.68rem;text-transform:uppercase;background:var(--verde);color:#fff;padding:5px 11px;border-radius:20px;flex:0 0 auto;}
+.jogo-card.off .jc-tag{background:#b8a878;}
+.autores select{flex:1;font-family:'Rajdhani';font-weight:700;font-size:1.02rem;background:#fff;border:2px solid #c9c1a6;border-radius:4px;padding:9px 11px;outline:none;color:var(--tinta);}
+.autores select:focus{border-color:var(--verde);}
 </style>
 </head>
 <body>
@@ -196,6 +206,17 @@ body{font-family:'Rajdhani',sans-serif;color:var(--tinta);min-height:100dvh;over
       <button class="btn ghost" onclick="go('choice')">← Voltar</button>
     </section>
 
+    <!-- PARTIDA -->
+    <section class="screen" data-screen="partida">
+      <div class="center" style="margin:10px 0 4px;"><span class="banner sm">Escolha a partida</span></div>
+      <div class="card tl">
+        <h2 class="h-poster center" style="font-size:1.45rem;">Qual jogo você quer palpitar?</h2>
+        <p class="sub center" style="margin-bottom:2px;">Vale <b>um palpite por jogo</b>.</p>
+        <div id="lista-jogos"></div>
+      </div>
+      <button class="btn ghost" onclick="go('choice')">← Voltar</button>
+    </section>
+
     <!-- BOLÃO -->
     <section class="screen" data-screen="bolao">
       <div class="center" style="margin:10px 0 4px;"><span class="banner sm">Bolão</span></div>
@@ -217,6 +238,7 @@ body{font-family:'Rajdhani',sans-serif;color:var(--tinta);min-height:100dvh;over
         </div>
         <div class="autores" id="autores"></div>
         <p class="hint" style="margin-top:6px;">Desempate: quem acertar o placar <b>e</b> os autores dos gols do Brasil leva o prêmio extra. 🏆</p>
+        <div id="msg-bolao"></div>
       </div>
       <button class="btn" onclick="finish()"><span class="flash"></span>Confirmar palpite</button>
       <button class="btn ghost" onclick="go('choice')">← Voltar</button>
@@ -238,7 +260,7 @@ body{font-family:'Rajdhani',sans-serif;color:var(--tinta);min-height:100dvh;over
         <p class="sub center">Seu palpite já está no <b style="color:var(--verde-esc)">telão</b>. Fique de olho — o ganhador sai por lá! Mostre esta tela pro garçom pra retirar o prêmio.</p>
       </div>
       <button class="btn amarelo" onclick="share()"><span class="flash"></span>Chamar a galera</button>
-      <button class="btn ghost" onclick="resetAll()">Fazer outro palpite</button>
+      <button class="btn ghost" onclick="go('choice')">Voltar ao início</button>
     </section>
 
     <div class="foot">
@@ -307,10 +329,21 @@ const CONFIG = {
     id:"brasil-marrocos-2026-06-13",
     casa:{nome:"BRASIL",   flagId:"BR"},
     fora:{nome:"MARROCOS", flagId:"MA"},
-    brasilLado:"casa"                              // de que lado o Brasil joga ("casa" ou "fora")
+    brasilLado:"casa",                             // de que lado o Brasil joga ("casa" ou "fora")
+    quando:"13/06 · 19h"
   },
   premioExtra:"Prêmio extra (à definir)",
-  jogadoresBrasil:["Vinícius Jr","Rodrygo","Raphinha","Endrick","Estêvão","Richarlison","Gabriel Jesus","Pedro","Savinho","Bruno Guimarães","Paquetá","Neymar"],
+  convocados:[
+    "Vinícius Jr","Raphinha","Matheus Cunha","Neymar","Gabriel Martinelli","Endrick","Luiz Henrique","Igor Thiago","Rayan",
+    "Lucas Paquetá","Bruno Guimarães","Casemiro","Fabinho","Danilo (Botafogo)",
+    "Wesley","Alex Sandro","Douglas Santos","Danilo (Flamengo)",
+    "Marquinhos","Gabriel Magalhães","Bremer","Léo Pereira","Ibañez",
+    "Alisson","Ederson","Weverton"
+  ],
+  proximos:[
+    {nome:"BRASIL × HAITI",   quando:"19/06 · em breve"},
+    {nome:"BRASIL × ESCÓCIA", quando:"24/06 · em breve"}
+  ],
   curiosidades:[
     "O Brasil é a única seleção a disputar todas as Copas do Mundo.",
     "Pelé é o único jogador com 3 títulos mundiais (1958, 1962 e 1970).",
@@ -361,6 +394,10 @@ async function addPalpite(p){
   if(FB){ await FDB.collection('jogos').doc(CONFIG.jogo.id).collection('palpites').doc(p.tel).set(p); return; }
   const b=(await Demo.get(GAME))||{palpites:[]}; b.palpites=b.palpites.filter(x=>x.tel!==p.tel); b.palpites.push(p); await Demo.set(GAME,b);
 }
+async function getPalpite(tel){
+  if(FB){ const d=await FDB.collection('jogos').doc(CONFIG.jogo.id).collection('palpites').doc(tel).get(); return d.exists?d.data():null; }
+  const b=(await Demo.get(GAME))||{palpites:[]}; return b.palpites.find(x=>x.tel===tel)||null;
+}
 let palpitesAtuais=[];
 function subscribePalpites(cb){
   if(FB){
@@ -404,7 +441,7 @@ async function cadastrar(){
   if(await findLead(tel)){showMsg('msg-novo','Esse celular já tem cadastro! Use "Já tenho cadastro".','bad');return;}
   usuario={nome:nome.value.trim(),sobrenome:sobr.value.trim(),tel,nasc:nasc.value,criado:Date.now()};
   await addLead(usuario);
-  go('bolao');
+  renderPartidas(); go('partida');
 }
 /* ---- RETORNO ---- */
 async function entrar(){
@@ -414,7 +451,7 @@ async function entrar(){
   if(!u){t.classList.add('err');showMsg('msg-retorno','Não achamos esse celular. Toque em "Voltar" e cadastre-se. 😉','bad');return;}
   usuario=u; t.classList.remove('err');
   showMsg('msg-retorno','Achamos você, '+u.nome+'! 🎉','good');
-  setTimeout(()=>go('bolao'),700);
+  setTimeout(()=>{renderPartidas();go('partida');},700);
 }
 
 /* ---- BOLÃO ---- */
@@ -423,6 +460,25 @@ BR:'<svg viewBox="0 0 90 63" preserveAspectRatio="none" style="width:100%;height
 MA:'<svg viewBox="0 0 90 60" preserveAspectRatio="none" style="width:100%;height:100%;display:block"><rect width="90" height="60" fill="#c1272d"/><path d="M45 17 L52.6 40.5 L32.6 26 L57.4 26 L37.4 40.5 Z" fill="none" stroke="#006233" stroke-width="2.4" stroke-linejoin="round"/></svg>'
 };
 function flagHTML(t){return (t.flagId&&FLAGS[t.flagId])||faixas(t.flag||["#999"]);}
+function renderPartidas(){
+  const j=CONFIG.jogo, box=document.getElementById('lista-jogos');
+  let h=`<button class="jogo-card" onclick="selecionarJogo()"><span class="mini">${FLAGS[j.casa.flagId]||''}</span><span class="mini">${FLAGS[j.fora.flagId]||''}</span><span><span class="jc-nome">${j.casa.nome} × ${j.fora.nome}</span><br><span class="jc-quando">${j.quando||''}</span></span><span class="jc-tag">Palpitar</span></button>`;
+  (CONFIG.proximos||[]).forEach(p=>{ h+=`<div class="jogo-card off"><span><span class="jc-nome">${p.nome}</span><br><span class="jc-quando">${p.quando}</span></span><span class="jc-tag">Em breve</span></div>`; });
+  box.innerHTML=h;
+}
+async function selecionarJogo(){
+  const ja=await getPalpite(usuario.tel);
+  if(ja){ mostrarPalpite(ja,true); return; }
+  go('bolao');
+}
+function mostrarPalpite(p,ja){
+  document.getElementById('cf-num').textContent=p.numero||'—';
+  document.getElementById('cf-nome').textContent= ja ? ('Você já está no bolão deste jogo, '+usuario.nome+'! ✅') : ('Boa sorte, '+usuario.nome+'! 🍀');
+  document.querySelector('[data-screen="ok"] .h-poster').textContent= ja ? 'Já tá valendo!' : 'Tá valendo!';
+  document.getElementById('cf-palpite').textContent=`${CONFIG.jogo.casa.nome} ${p.casa} × ${p.fora} ${CONFIG.jogo.fora.nome}`;
+  document.getElementById('cf-autores').textContent=(p.autores&&p.autores.length)?('Gols Brasil: '+p.autores.join(', ')):'';
+  go('ok');
+}
 function setupJogo(){
   const j=CONFIG.jogo;
   document.getElementById('nm-casa').textContent=j.casa.nome;
@@ -430,7 +486,6 @@ function setupJogo(){
   document.getElementById('flag-casa').innerHTML=flagHTML(j.casa);
   document.getElementById('flag-fora').innerHTML=flagHTML(j.fora);
   document.getElementById('bo-quando').textContent=j.casa.nome+' × '+j.fora.nome;
-  document.getElementById('dl-jogadores').innerHTML=CONFIG.jogadoresBrasil.map(p=>`<option value="${p}">`).join('');
   renderAutores();
 }
 function faixas(c){return c.map(x=>`<div style="flex:1;background:${x}"></div>`).join('');}
@@ -438,22 +493,23 @@ function pl(lado,d){palpite[lado]=Math.max(0,Math.min(15,palpite[lado]+d));docum
 function renderAutores(){
   const n=palpite[CONFIG.jogo.brasilLado];
   const box=document.getElementById('autores');
-  const old=[...box.querySelectorAll('input')].map(i=>i.value);
+  const old=[...box.querySelectorAll('select')].map(s=>s.value);
   if(n===0){box.innerHTML=`<div class="ah">Autores dos gols do Brasil</div><p class="hint">Brasil sem gols no seu palpite — sem autores. 😅</p>`;return;}
+  const opts=CONFIG.convocados.map(j=>`<option value="${j}">${j}</option>`).join('');
   let h=`<div class="ah">Autores dos gols do Brasil (${n})</div>`;
-  for(let i=0;i<n;i++) h+=`<div class="arow"><span class="anum">${i+1}</span><input list="dl-jogadores" placeholder="Quem marca o ${i+1}º gol?" value="${old[i]||''}"></div>`;
+  for(let i=0;i<n;i++) h+=`<div class="arow"><span class="anum">${i+1}</span><select><option value="">— escolha o jogador —</option>${opts}</select></div>`;
   box.innerHTML=h;
+  const sel=box.querySelectorAll('select'); old.forEach((v,i)=>{ if(sel[i]&&v) sel[i].value=v; });
 }
 async function finish(){
-  const autores=[...document.querySelectorAll('#autores input')].map(i=>i.value.trim()).filter(Boolean);
+  const autores=[...document.querySelectorAll('#autores select')].map(s=>s.value).filter(Boolean);
+  const nBr=palpite[CONFIG.jogo.brasilLado];
+  if(autores.length<nBr){ showMsg('msg-bolao','Escolha os autores dos '+nBr+' gols do Brasil. ⚽','bad'); return; }
   palpite.autores=autores;
   numeroSorte=String(Math.floor(100000+Math.random()*900000));
-  await addPalpite({tel:usuario.tel,nome:usuario.nome+' '+usuario.sobrenome.charAt(0)+'.',casa:palpite.casa,fora:palpite.fora,autores,numero:numeroSorte,ts:Date.now()});
-  document.getElementById('cf-num').textContent=numeroSorte;
-  document.getElementById('cf-nome').textContent="Boa sorte, "+usuario.nome+"! 🍀";
-  document.getElementById('cf-palpite').textContent=`${CONFIG.jogo.casa.nome} ${palpite.casa} × ${palpite.fora} ${CONFIG.jogo.fora.nome}`;
-  document.getElementById('cf-autores').textContent=autores.length?('Gols Brasil: '+autores.join(', ')):'';
-  go('ok');
+  const reg={tel:usuario.tel,nome:usuario.nome+' '+usuario.sobrenome.charAt(0)+'.',casa:palpite.casa,fora:palpite.fora,autores,numero:numeroSorte,ts:Date.now()};
+  await addPalpite(reg);
+  mostrarPalpite(reg,false);
 }
 function share(){
   const url=siteURL();
