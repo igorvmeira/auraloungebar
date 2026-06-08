@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aura de Copa · Admin</title>
+<meta name="theme-color" content="#054d12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+:root{--verde:#008e0f;--verde-esc:#006a0b;--verde-mais:#054d12;--amarelo:#e0a800;--papel:#f4efe2;--tinta:#1b2a1b;--linha:#ddd3b8;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Rajdhani',sans-serif;background:var(--papel);color:var(--tinta);min-height:100dvh;}
+.wrap{max-width:1080px;margin:0 auto;padding:18px 16px 60px;}
+
+/* TOPO */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:3px solid var(--verde);padding-bottom:12px;margin-bottom:18px;}
+.brand{font-family:'Poppins';font-weight:900;color:var(--verde-esc);font-size:1.5rem;letter-spacing:-.02em;}
+.brand small{display:block;font-family:'Rajdhani';font-weight:700;letter-spacing:.28em;color:var(--amarelo);font-size:.7rem;text-transform:uppercase;}
+.btn{border:none;cursor:pointer;font-family:'Poppins';font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:.03em;padding:10px 16px;border-radius:8px;background:var(--verde);color:#fff;transition:.1s;}
+.btn:active{transform:translateY(2px);}
+.btn.ghost{background:transparent;color:var(--verde-esc);border:2px solid var(--verde);}
+.btn.sm{padding:7px 12px;font-size:.78rem;}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+
+/* CARDS DE NÚMERO */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px;}
+.stat{background:#fff;border:1px solid var(--linha);border-radius:14px;padding:14px 16px;box-shadow:0 6px 16px rgba(0,0,0,.05);}
+.stat .n{font-family:'Poppins';font-weight:900;font-size:2rem;color:var(--verde-esc);line-height:1;}
+.stat .l{font-family:'Rajdhani';font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:.78rem;color:#6b6347;margin-top:2px;}
+
+/* ABAS */
+.tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.tab{cursor:pointer;font-family:'Poppins';font-weight:800;font-size:.9rem;padding:9px 16px;border-radius:30px;background:#e7dec5;color:#6b6347;border:none;}
+.tab.on{background:var(--verde);color:#fff;}
+
+/* CONTROLES */
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+.controls input,.controls select{font-family:'Rajdhani';font-weight:600;font-size:1rem;padding:10px 12px;border:2px solid var(--linha);border-radius:8px;background:#fff;outline:none;}
+.controls input{flex:1;min-width:180px;}
+.controls input:focus,.controls select:focus{border-color:var(--verde);}
+.live{display:flex;align-items:center;gap:6px;font-family:'Rajdhani';font-weight:700;color:var(--verde-esc);font-size:.85rem;}
+.dot{width:9px;height:9px;border-radius:50%;background:#bbb;}
+.dot.on{background:#28c049;box-shadow:0 0 0 4px rgba(40,192,73,.2);animation:pulse 1.6s infinite;}
+@keyframes pulse{50%{box-shadow:0 0 0 7px rgba(40,192,73,0);}}
+
+/* TABELA */
+.tablewrap{background:#fff;border:1px solid var(--linha);border-radius:14px;overflow:hidden;box-shadow:0 6px 16px rgba(0,0,0,.05);}
+table{width:100%;border-collapse:collapse;}
+th,td{padding:11px 12px;text-align:left;font-size:.95rem;}
+th{font-family:'Poppins';font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-size:.72rem;color:#6b6347;background:#faf6ec;border-bottom:2px solid var(--linha);white-space:nowrap;}
+td{border-bottom:1px solid #efe7d2;font-family:'Rajdhani';font-weight:600;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fcfaf3;}
+td.mono{font-variant-numeric:tabular-nums;}
+.placar{font-family:'Poppins';font-weight:900;color:var(--verde-esc);}
+.placar .x{color:var(--amarelo);}
+.tags{display:flex;flex-wrap:wrap;gap:4px;}
+.tag{background:#e4f6e6;color:var(--verde-esc);font-weight:700;font-size:.8rem;padding:2px 8px;border-radius:20px;}
+.num{font-family:'Poppins';font-weight:800;color:#b07c00;}
+.empty{padding:40px;text-align:center;color:#8a8267;font-weight:600;}
+.section{display:none;} .section.on{display:block;}
+
+/* GATE (login) */
+#gate{position:fixed;inset:0;background:var(--verde-mais);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50;}
+.gatebox{background:var(--papel);border-radius:18px;padding:30px 26px;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.4);}
+.gatebox .b{font-family:'Poppins';font-weight:900;color:var(--verde-esc);font-size:1.7rem;}
+.gatebox small{display:block;font-family:'Rajdhani';font-weight:700;letter-spacing:.28em;color:var(--amarelo);text-transform:uppercase;font-size:.7rem;margin-bottom:18px;}
+.gatebox input{width:100%;font-family:'Poppins';font-weight:700;font-size:1.3rem;text-align:center;letter-spacing:.3em;padding:13px;border:2px solid var(--linha);border-radius:10px;outline:none;margin-bottom:12px;}
+.gatebox input:focus{border-color:var(--verde);}
+.gatebox .err{color:#c0392b;font-weight:700;font-size:.85rem;min-height:18px;margin-top:6px;}
+.note{font-size:.78rem;color:#6b6347;margin-top:18px;line-height:1.4;}
+@media(max-width:640px){ th,td{padding:9px 8px;font-size:.86rem;} .brand{font-size:1.2rem;} }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="gate">
+  <div class="gatebox">
+    <div class="b">Aura de Copa</div><small>Painel do Admin</small>
+    <input id="pin" type="password" inputmode="numeric" placeholder="• • • •" autocomplete="off">
+    <button class="btn" style="width:100%;font-size:1rem;padding:13px;" onclick="entrar()">Entrar</button>
+    <div class="err" id="gate-err"></div>
+    <div class="note">Acesso restrito. Use o PIN definido no arquivo.</div>
+  </div>
+</div>
+
+<!-- PAINEL -->
+<div class="wrap" id="painel" style="display:none;">
+  <div class="top">
+    <div class="brand">Aura de Copa <small>Painel do Admin</small></div>
+    <div class="row">
+      <span class="live"><span class="dot" id="livedot"></span><span id="livetxt">conectando…</span></span>
+      <button class="btn ghost sm" onclick="sair()">Sair</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n" id="st-leads">0</div><div class="l">Leads cadastrados</div></div>
+    <div class="stat"><div class="n" id="st-palpites">0</div><div class="l">Palpites neste jogo</div></div>
+    <div class="stat"><div class="n" id="st-hoje">0</div><div class="l">Cadastros hoje</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" data-tab="leads" onclick="aba('leads')">👥 Leads</button>
+    <button class="tab" data-tab="bolao" onclick="aba('bolao')">⚽ Bolão</button>
+  </div>
+
+  <!-- LEADS -->
+  <div class="section on" data-sec="leads">
+    <div class="controls">
+      <input id="busca-leads" placeholder="Buscar por nome ou celular…" oninput="renderLeads()">
+      <button class="btn sm" onclick="exportLeads()">⬇ Exportar CSV</button>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>#</th><th>Nome</th><th>Sobrenome</th><th>Celular</th><th>Nascimento</th><th>Idade</th><th>Cadastrado em</th></tr></thead>
+        <tbody id="tb-leads"></tbody>
+      </table>
+      <div class="empty" id="empty-leads">Nenhum lead ainda.</div>
+    </div>
+  </div>
+
+  <!-- BOLÃO -->
+  <div class="section" data-sec="bolao">
+    <div class="controls">
+      <select id="sel-jogo" onchange="trocarJogo()"></select>
+      <input id="busca-palpites" placeholder="Buscar por nome ou celular…" oninput="renderPalpites()">
+      <button class="btn sm" onclick="exportPalpites()">⬇ Exportar CSV</button>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>#</th><th>Nome</th><th>Celular</th><th>Placar</th><th>Autores (Brasil)</th><th>Nº sorte</th><th>Quando</th></tr></thead>
+        <tbody id="tb-palpites"></tbody>
+      </table>
+      <div class="empty" id="empty-palpites">Nenhum palpite neste jogo ainda.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===================== CONFIG ===================== */
+const ADMIN_PIN = "2026";   // <<< TROQUE pelo seu PIN secreto
+
+const firebaseConfig = {
+  apiKey:"AIzaSyCfhJ0jj3sgUOvKqSMYAnRCZFU8M633k0E",
+  authDomain:"auraloungebar-ebe24.firebaseapp.com",
+  projectId:"auraloungebar-ebe24",
+  storageBucket:"auraloungebar-ebe24.firebasestorage.app",
+  messagingSenderId:"702341502684",
+  appId:"1:702341502684:web:8790b51829eb2618638619"
+};
+
+// Jogos disponíveis (mesmos ids usados no index.html). Adicione novos aqui quando abrir.
+const JOGOS = [
+  { id:"brasil-marrocos-2026-06-13", label:"Brasil × Marrocos · 13/06" }
+];
+
+/* ===================== ESTADO ===================== */
+let FDB=null, leadsCache=[], palpitesCache=[], jogoAtual=JOGOS[0].id, unsubL=null, unsubP=null;
+
+/* ===================== LOGIN ===================== */
+function entrar(){
+  const v=document.getElementById('pin').value.trim();
+  if(v===ADMIN_PIN){ document.getElementById('gate').style.display='none'; document.getElementById('painel').style.display='block'; iniciar(); }
+  else { document.getElementById('gate-err').textContent='PIN incorreto.'; }
+}
+document.getElementById('pin').addEventListener('keydown',e=>{ if(e.key==='Enter') entrar(); });
+function sair(){ location.reload(); }
+
+/* ===================== FIREBASE ===================== */
+function iniciar(){
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    FDB=firebase.firestore();
+    setLive(true,'ao vivo');
+    // jogos no seletor
+    document.getElementById('sel-jogo').innerHTML=JOGOS.map(j=>`<option value="${j.id}">${j.label}</option>`).join('');
+    assinarLeads();
+    assinarPalpites();
+  }catch(e){ console.error(e); setLive(false,'erro de conexão'); }
+}
+function setLive(on,txt){ document.getElementById('livedot').classList.toggle('on',on); document.getElementById('livetxt').textContent=txt; }
+
+function assinarLeads(){
+  if(unsubL) unsubL();
+  unsubL=FDB.collection('leads').onSnapshot(s=>{
+    leadsCache=s.docs.map(d=>d.data());
+    leadsCache.sort((a,b)=>(b.criado||0)-(a.criado||0));
+    document.getElementById('st-leads').textContent=leadsCache.length;
+    const hoje=new Date(); hoje.setHours(0,0,0,0);
+    document.getElementById('st-hoje').textContent=leadsCache.filter(l=>(l.criado||0)>=hoje.getTime()).length;
+    renderLeads();
+  }, e=>{ console.error(e); setLive(false,'sem permissão de leitura'); });
+}
+function assinarPalpites(){
+  if(unsubP) unsubP();
+  unsubP=FDB.collection('jogos').doc(jogoAtual).collection('palpites').onSnapshot(s=>{
+    palpitesCache=s.docs.map(d=>d.data());
+    palpitesCache.sort((a,b)=>(b.ts||0)-(a.ts||0));
+    document.getElementById('st-palpites').textContent=palpitesCache.length;
+    renderPalpites();
+  }, e=>console.error(e));
+}
+function trocarJogo(){ jogoAtual=document.getElementById('sel-jogo').value; assinarPalpites(); }
+
+/* ===================== HELPERS ===================== */
+function fmtTel(t){ const d=(t||'').replace(/\D/g,''); if(d.length===11) return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`; if(d.length===10) return `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`; return t||''; }
+function fmtNasc(n){ if(!n) return '—'; const p=n.split('-'); return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:n; }
+function idade(n){ if(!n) return '—'; const b=new Date(n); if(isNaN(b)) return '—'; const h=new Date(); let a=h.getFullYear()-b.getFullYear(); const m=h.getMonth()-b.getMonth(); if(m<0||(m===0&&h.getDate()<b.getDate()))a--; return a>=0&&a<130?a:'—'; }
+function fmtData(ms){ if(!ms) return '—'; const d=new Date(ms); const z=x=>String(x).padStart(2,'0'); return `${z(d.getDate())}/${z(d.getMonth()+1)}/${d.getFullYear()} ${z(d.getHours())}:${z(d.getMinutes())}`; }
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+/* ===================== RENDER ===================== */
+function aba(t){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  document.querySelectorAll('.section').forEach(s=>s.classList.toggle('on',s.dataset.sec===t));
+}
+function renderLeads(){
+  const q=(document.getElementById('busca-leads').value||'').toLowerCase().trim();
+  const rows=leadsCache.filter(l=>!q || (`${l.nome} ${l.sobrenome}`.toLowerCase().includes(q) || (l.tel||'').includes(q.replace(/\D/g,''))));
+  const tb=document.getElementById('tb-leads');
+  document.getElementById('empty-leads').style.display=rows.length?'none':'block';
+  tb.innerHTML=rows.map((l,i)=>`<tr>
+    <td class="mono">${i+1}</td><td>${esc(l.nome)}</td><td>${esc(l.sobrenome)}</td>
+    <td class="mono">${fmtTel(l.tel)}</td><td class="mono">${fmtNasc(l.nasc)}</td>
+    <td class="mono">${idade(l.nasc)}</td><td class="mono">${fmtData(l.criado)}</td></tr>`).join('');
+}
+function renderPalpites(){
+  const q=(document.getElementById('busca-palpites').value||'').toLowerCase().trim();
+  const rows=palpitesCache.filter(p=>!q || (p.nome||'').toLowerCase().includes(q) || (p.tel||'').includes(q.replace(/\D/g,'')));
+  const tb=document.getElementById('tb-palpites');
+  document.getElementById('empty-palpites').style.display=rows.length?'none':'block';
+  tb.innerHTML=rows.map((p,i)=>`<tr>
+    <td class="mono">${i+1}</td><td>${esc(p.nome)}</td><td class="mono">${fmtTel(p.tel)}</td>
+    <td class="placar">${p.casa} <span class="x">×</span> ${p.fora}</td>
+    <td><div class="tags">${(p.autores||[]).map(a=>`<span class="tag">${esc(a)}</span>`).join('')||'—'}</div></td>
+    <td class="num">${esc(p.numero||'—')}</td><td class="mono">${fmtData(p.ts)}</td></tr>`).join('');
+}
+
+/* ===================== EXPORT CSV ===================== */
+function baixarCSV(nome, linhas){
+  const csv='\uFEFF'+linhas.map(r=>r.map(c=>{const s=(c==null?'':String(c)); return /[";\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}).join(';')).join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})); a.download=nome; a.click(); URL.revokeObjectURL(a.href);
+}
+function exportLeads(){
+  const h=['Nome','Sobrenome','Celular','Nascimento','Idade','Cadastrado em'];
+  const rows=leadsCache.map(l=>[l.nome,l.sobrenome,fmtTel(l.tel),fmtNasc(l.nasc),idade(l.nasc),fmtData(l.criado)]);
+  baixarCSV('aura-leads.csv',[h,...rows]);
+}
+function exportPalpites(){
+  const lbl=(JOGOS.find(j=>j.id===jogoAtual)||{}).label||jogoAtual;
+  const h=['Nome','Celular','Casa','Fora','Autores Brasil','Nº sorte','Quando'];
+  const rows=palpitesCache.map(p=>[p.nome,fmtTel(p.tel),p.casa,p.fora,(p.autores||[]).join(' / '),p.numero,fmtData(p.ts)]);
+  baixarCSV('aura-palpites-'+jogoAtual+'.csv',[[lbl],h,...rows]);
+}
+
+setTimeout(()=>document.getElementById('pin').focus(),200);
+</script>
+</body>
+</html>
