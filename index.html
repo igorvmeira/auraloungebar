@@ -135,13 +135,33 @@ body{font-family:'Rajdhani',sans-serif;color:var(--tinta);min-height:100dvh;over
 .tv-foot .tag{flex:0 0 auto;background:var(--amarelo);color:var(--tinta);font-family:'Poppins';font-weight:900;text-transform:uppercase;font-size:clamp(.7rem,1.3vw,1rem);padding:5px 12px;border-radius:20px;letter-spacing:.04em;}
 .tv-foot .cur{font-family:'Rajdhani';font-weight:700;color:#fff;font-size:clamp(.95rem,1.7vw,1.35rem);transition:opacity .5s;text-shadow:0 1px 2px rgba(0,0,0,.3);}
 .tv-foot .cur b{color:var(--amarelo);}
-.tv-exit{position:absolute;top:8px;left:10px;z-index:5;font-size:.65rem;color:rgba(255,255,255,.35);text-decoration:none;font-family:'Poppins';font-weight:700;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;}
+.tv-ctrl{position:absolute;top:9px;left:11px;z-index:6;display:flex;gap:8px;}
+.tv-ctrl button{font-family:'Poppins';font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:.62rem;color:#fff;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.28);border-radius:20px;padding:6px 12px;cursor:pointer;}
+.tv-ctrl button:hover{background:rgba(0,0,0,.55);}
 
-@media (max-width:780px){
+@media (orientation:portrait){
   .tv-grid{grid-template-columns:1fr;grid-template-rows:auto auto auto auto;height:auto;min-height:100dvh;}
   .tv-head{grid-column:1;flex-wrap:wrap;justify-content:center;}
   .tv-foot{grid-column:1;}
   .tv-right{min-height:40vh;}
+}
+@media (max-height:560px){
+  .tv-grid{padding:12px 18px;gap:10px;}
+  .tv-head .title .c{font-size:clamp(1.4rem,3vw,2.4rem);}
+  .tv-logo{height:40px;}
+  .confronto{padding:9px 12px;}
+  .confronto .fl{width:clamp(54px,7vw,90px);height:clamp(36px,4.6vw,60px);}
+  .countdown{padding:9px;}
+  .countdown .cd{font-size:clamp(2rem,5.5vw,3.4rem);}
+  .countdown .cl{font-size:clamp(.7rem,1.4vw,1rem);}
+  .regra{padding:9px 12px;line-height:1.25;}
+  .qrbox{padding:8px;}
+  .qrbox .qt{font-size:.6rem;margin-top:3px;}
+  #qrcode img,#qrcode canvas{width:96px;height:96px;}
+  .tv-right{padding:10px 12px;}
+  .tv-right .rh{padding-bottom:6px;margin-bottom:6px;}
+  .prow{padding:6px 5px;}
+  .tv-foot{padding:9px 14px;}
 }
 .jogo-card{display:flex;align-items:center;gap:10px;width:100%;background:#fff;border:2px solid var(--verde);border-radius:12px;padding:11px 12px;margin-top:10px;cursor:pointer;text-align:left;font-family:inherit;}
 .jogo-card:active{transform:translateY(2px);}
@@ -279,7 +299,7 @@ body{font-family:'Rajdhani',sans-serif;color:var(--tinta);min-height:100dvh;over
 
 <!-- ================= TELÃO ================= -->
 <div id="telao">
-  <a class="tv-exit" onclick="telao(false)">◂ sair</a>
+  <div class="tv-ctrl"><button id="btn-full" onclick="toggleFull()">⛶ Tela cheia</button><button onclick="telao(false)">◂ Sair</button></div>
   <img class="tv-collage-t band" data-img="top" src="" alt="">
   <img class="tv-collage-b band" data-img="bottom" src="" alt="">
   <div class="tv-grid">
@@ -580,6 +600,13 @@ function rotaCuriosidade(){
 }
 
 /* ================= INIT ================= */
+function toggleFull(){
+  const el=document.documentElement;
+  if(!document.fullscreenElement){ (el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el); }
+  else { (document.exitFullscreen||document.webkitExitFullscreen||function(){}).call(document); }
+}
+document.addEventListener('fullscreenchange',()=>{ const b=document.getElementById('btn-full'); if(b) b.textContent=document.fullscreenElement?'⤢ Sair da tela cheia':'⛶ Tela cheia'; });
+let _cur; document.addEventListener('mousemove',()=>{ document.body.style.cursor='default'; clearTimeout(_cur); _cur=setTimeout(()=>{ if(document.fullscreenElement) document.body.style.cursor='none'; },3000); });
 (function init(){
   initData();
   document.querySelectorAll('[data-img]').forEach(el=>el.src=IMG[el.dataset.img]);
