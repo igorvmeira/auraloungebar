@@ -123,11 +123,14 @@ body{font-family:'Rajdhani',sans-serif;color:var(--tinta);min-height:100dvh;over
 .tv-right .rh{font-family:'Poppins';font-weight:900;text-transform:uppercase;color:var(--verde-esc);font-size:clamp(1rem,2vw,1.5rem);display:flex;justify-content:space-between;align-items:baseline;border-bottom:3px solid var(--verde);padding-bottom:8px;margin-bottom:8px;}
 .tv-right .rh small{font-family:'Rajdhani';font-weight:700;color:#6b6347;font-size:.7em;}
 .palpites{overflow:hidden;flex:1;}
+#tv-lista{will-change:transform;}
+.social-cta{background:var(--amarelo);color:var(--tinta);border-radius:14px;padding:11px 14px;font-family:'Rajdhani';font-weight:700;font-size:clamp(.85rem,1.5vw,1.15rem);line-height:1.25;box-shadow:0 8px 22px rgba(0,0,0,.3);}
+.social-cta b{font-family:'Poppins';font-weight:800;}
 .prow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 6px;border-bottom:1px dashed #cfc6a8;}
 .prow .pn{font-family:'Rajdhani';font-weight:700;font-size:clamp(1rem,1.8vw,1.35rem);color:var(--tinta);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .prow .pp{font-family:'Poppins';font-weight:900;font-size:clamp(1rem,1.8vw,1.4rem);color:var(--verde-esc);background:#fff;border:2px solid var(--verde);border-radius:7px;padding:2px 10px;flex:0 0 auto;}
 .prow .pp .x{color:var(--amarelo-q);}
-.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;color:#7a7258;gap:8px;}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:150px;height:100%;text-align:center;color:#7a7258;gap:8px;}
 .empty .big{font-family:'Poppins';font-weight:900;color:var(--verde-esc);font-size:clamp(1.1rem,2.2vw,1.6rem);text-transform:uppercase;}
 
 /* rodapé: curiosidade */
@@ -320,12 +323,12 @@ body{font-family:'Rajdhani',sans-serif;color:var(--tinta);min-height:100dvh;over
         <div class="cd" id="cd-time">--:--:--</div>
         <div class="cu">horas · min · seg</div>
       </div>
-      <div class="regra">🏆 <b>Prêmio extra:</b> quem cravar o <b>placar exato</b> e <b>todos os autores dos gols do Brasil</b> leva! Em caso de empate no placar, o desempate são os autores dos gols.</div>
+      <div class="social-cta">📸 <b>Tá no Aura?</b> Poste e marque <b>@aurabar.lounge</b> · <b>#AuraDeCopa</b> e concorra a um <b>prêmio extra</b>!</div>
     </div>
 
     <div class="tv-right">
       <div class="rh"><span>Palpites de hoje</span><small id="tv-count">0 no bolão</small></div>
-      <div class="palpites" id="tv-lista"></div>
+      <div class="palpites" id="tv-lista-wrap"><div id="tv-lista"></div></div>
     </div>
 
     <div class="tv-foot">
@@ -586,11 +589,8 @@ function renderLista(){
 }
 let FEED=[];
 function buildFeed(){
-  FEED=[];
-  CONFIG.curiosidades.forEach((c,i)=>{
-    FEED.push({tag:'Você sabia?', html:c});
-    if(i%2===1) FEED.push({tag:'📸 Marque a gente', html:`Tá no Aura? Poste e marque <b>${CONFIG.social.instagram}</b> · <b>${CONFIG.social.hashtag}</b> e concorra a um <b>prêmio extra</b>!`});
-  });
+  FEED=[{tag:'🏆 Prêmio extra', html:'Quem cravar o <b>placar exato</b> e <b>todos os autores dos gols do Brasil</b> leva! Desempate: os autores dos gols.'}];
+  CONFIG.curiosidades.forEach(c=>FEED.push({tag:'Você sabia?', html:c}));
 }
 function rotaCuriosidade(){
   if(!FEED.length) buildFeed();
@@ -607,6 +607,22 @@ function toggleFull(){
 }
 document.addEventListener('fullscreenchange',()=>{ const b=document.getElementById('btn-full'); if(b) b.textContent=document.fullscreenElement?'⤢ Sair da tela cheia':'⛶ Tela cheia'; });
 let _cur; document.addEventListener('mousemove',()=>{ document.body.style.cursor='default'; clearTimeout(_cur); _cur=setTimeout(()=>{ if(document.fullscreenElement) document.body.style.cursor='none'; },3000); });
+let _so=0,_phase='scroll',_until=0;
+function tickScroll(ts){
+  const wrap=document.getElementById('tv-lista-wrap'), track=document.getElementById('tv-lista');
+  if(wrap&&track){
+    const max=Math.max(0, track.scrollHeight - wrap.clientHeight - 2);
+    if(max<=0){ _so=0; }
+    else { if(_so>max)_so=max;
+      if(_phase==='scroll'){ _so+=0.4; if(_so>=max){_so=max;_phase='pauseBottom';_until=ts+2500;} }
+      else if(_phase==='pauseBottom'){ if(ts>=_until){_so=0;_phase='pauseTop';_until=ts+1500;} }
+      else if(_phase==='pauseTop'){ if(ts>=_until)_phase='scroll'; }
+    }
+    track.style.transform='translateY('+(-_so)+'px)';
+  }
+  requestAnimationFrame(tickScroll);
+}
+requestAnimationFrame(tickScroll);
 (function init(){
   initData();
   document.querySelectorAll('[data-img]').forEach(el=>el.src=IMG[el.dataset.img]);
