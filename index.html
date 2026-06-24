@@ -352,13 +352,13 @@ const CONFIG = {
   hashtag:"#AuraDeCopa",
   data:"13 de Junho",
   urlSite:"https://aura-de-copa.vercel.app",      // troque pela URL real (vira o QR do telão)
-  kickoff:"2026-06-19T21:30:00",                                      // ex: "2026-06-13T16:00:00". Vazio = demo (agora + 3h)
+  kickoff:"2026-06-24T19:00:00",                                      // ex: "2026-06-13T16:00:00". Vazio = demo (agora + 3h)
   jogo:{
-    id:"brasil-haiti-2026-06-19",
+    id:"brasil-escocia-2026-06-24",
     casa:{nome:"BRASIL",   flagId:"BR"},
-    fora:{nome:"HAITI",    flagId:"HT"},
+    fora:{nome:"ESCÓCIA",  flagId:"SC"},
     brasilLado:"casa",                             // de que lado o Brasil joga ("casa" ou "fora")
-    quando:"19/06 · 21h30"
+    quando:"24/06 · 19h"
   },
   premioExtra:"Prêmio extra (à definir)",
   convocados:[
@@ -368,9 +368,7 @@ const CONFIG = {
     "Marquinhos","Gabriel Magalhães","Bremer","Léo Pereira","Ibañez",
     "Alisson","Ederson","Weverton"
   ],
-  proximos:[
-    {nome:"BRASIL × ESCÓCIA", quando:"24/06 · em breve"}
-  ],
+  proximos:[],
   curiosidades:[
     "A primeira Copa do Mundo foi em 1930, no Uruguai — que também foi o primeiro campeão.",
     "Apenas 8 seleções já venceram a Copa: Brasil, Alemanha, Itália, Argentina, França, Uruguai, Inglaterra e Espanha.",
@@ -494,7 +492,8 @@ async function entrar(){
 const FLAGS={
 BR:'<svg viewBox="0 0 90 63" preserveAspectRatio="none" style="width:100%;height:100%;display:block"><rect width="90" height="63" fill="#009c3b"/><polygon points="45,7 83,31.5 45,56 7,31.5" fill="#ffdf00"/><circle cx="45" cy="31.5" r="13.5" fill="#002776"/><path d="M33 28 Q45 35 57 28" stroke="#fff" stroke-width="2.4" fill="none"/></svg>',
 MA:'<svg viewBox="0 0 90 60" preserveAspectRatio="none" style="width:100%;height:100%;display:block"><rect width="90" height="60" fill="#c1272d"/><path d="M45 17 L52.6 40.5 L32.6 26 L57.4 26 L37.4 40.5 Z" fill="none" stroke="#006233" stroke-width="2.4" stroke-linejoin="round"/></svg>',
-HT:'<svg viewBox="0 0 90 60" preserveAspectRatio="none" style="width:100%;height:100%;display:block"><rect width="90" height="30" fill="#00209f"/><rect y="30" width="90" height="30" fill="#d21034"/><rect x="32" y="18" width="26" height="24" fill="#fff"/><rect x="43.5" y="23" width="3" height="13" fill="#3d8b37"/><path d="M45 22 q-7 1 -9 6 M45 22 q7 1 9 6" stroke="#3d8b37" stroke-width="1.6" fill="none"/><rect x="40" y="34.5" width="10" height="2.4" fill="#5a3a1a"/></svg>'
+HT:'<svg viewBox="0 0 90 60" preserveAspectRatio="none" style="width:100%;height:100%;display:block"><rect width="90" height="30" fill="#00209f"/><rect y="30" width="90" height="30" fill="#d21034"/><rect x="32" y="18" width="26" height="24" fill="#fff"/><rect x="43.5" y="23" width="3" height="13" fill="#3d8b37"/><path d="M45 22 q-7 1 -9 6 M45 22 q7 1 9 6" stroke="#3d8b37" stroke-width="1.6" fill="none"/><rect x="40" y="34.5" width="10" height="2.4" fill="#5a3a1a"/></svg>',
+SC:'<svg viewBox="0 0 90 60" preserveAspectRatio="none" style="width:100%;height:100%;display:block"><rect width="90" height="60" fill="#0065bf"/><path d="M0 0 L90 60 M90 0 L0 60" stroke="#fff" stroke-width="11"/></svg>'
 };
 function flagHTML(t){return (t.flagId&&FLAGS[t.flagId])||faixas(t.flag||["#999"]);}
 function renderPartidas(){
